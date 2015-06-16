@@ -1,9 +1,9 @@
-(defpackage :sdl2-ttf.asdf
+(defpackage :cl-sdl2-ttf.asdf
   (:use #:cl #:asdf))
 
-(in-package :sdl2-mixer.asdf)
+(in-package :cl-sdl2-ttf.asdf)
 
-(defsystem :sdl2-ttf
+(defsystem :cl-sdl2-ttf
     :description "Bindings for sdl2_ttf using autowrap"
     :author "Bryan Baraoidan"
     :license "MIT"
@@ -18,4 +18,4 @@
                  (:file "general")
                  (:module autowrap-spec
                           :pathname "spec"
-                          :components ((:static-file "SDL_ttf")))))
+                          :components ((:static-file "SDL2_ttf.h")))))

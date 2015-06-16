@@ -1,7 +1,6 @@
 (in-package :cl-user)
-(defpackage :sdl2-mixer
+(defpackage :sdl2-ttf
   (:use #:cl
-        #:cffi
         #:alexandria
         #:autowrap.minimal
         #:plus-c
