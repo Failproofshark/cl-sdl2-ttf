@@ -1,5 +1,5 @@
-;;; This file is adapted from almostly completely verbatim from cl-sdl2-mixer as I needed the same functionality for font loading
-(in-package :sdl2-mixer)
+;;; This file is adapted from almostly completely verbatim from cl-sdl2-mixer as I needed the same functionality for font loading, originally written by the lispgames group (https://github.com/lispgames)
+(in-package :sdl2-ttf)
 
 (define-condition sdl-mixer-error (sdl2::sdl-rc-error) ())
 
