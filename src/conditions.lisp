@@ -1,9 +1,7 @@
 ;;; This file is adapted from almostly completely verbatim from cl-sdl2-mixer as I needed the same functionality for font loading, originally written by the lispgames group (https://github.com/lispgames)
 (in-package :sdl2-ttf)
 
-(define-condition sdl-mixer-error (sdl2::sdl-rc-error) ())
-
-;;; Note, Mix_GetError doesn't exist, it's a #define for SDL_GetError
+(define-condition sdl-ttf-error (sdl2::sdl-rc-error) ())
 
 (defmacro check-rc (form)
   (with-gensyms (rc)
