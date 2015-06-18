@@ -19,7 +19,7 @@
   (ttf-quit))
 
 (defun open-font (path-to-font point-size)
-  "Open a font specified by path-to-font at point-size (based on 72DPI). Returns a ttf-font struct and null on errors"
+  "Open a font specified by the path specifier path-to-font sized to integer point-size (based on 72DPI). Returns a ttf-font struct and null on errors"
   (autocollect (ptr)
                (check-null (ttf-open-font (namestring path-to-font) font-size))
                (ttf-close-font ptr)))

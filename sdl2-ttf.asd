@@ -1,9 +1,9 @@
-(defpackage :cl-sdl2-ttf.asdf
+(defpackage :sdl2-ttf.asdf
   (:use #:cl #:asdf))
 
-(in-package :cl-sdl2-ttf.asdf)
+(in-package :sdl2-ttf.asdf)
 
-(defsystem :cl-sdl2-ttf
+(defsystem :sdl2-ttf
     :description "Bindings for sdl2_ttf using autowrap"
     :author "Bryan Baraoidan"
     :license "MIT"
