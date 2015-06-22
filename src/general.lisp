@@ -28,19 +28,17 @@
   "Frees the memory used by the ttf-font-struct"
   (ttf-close-font ttf-font-struct))
 
-(cffi:defcstruct sdl-color
+(cffi:defcstruct (sdl-color)
   (r :uint8)
   (g :uint8)
   (b :uint8)
   (a :uint8))
 
-(cffi:defcfun ("TTF_RenderText_Solid" %sdl-render-text-solid) :pointer
+(cffi:defcfun ("TTF_RenderText_Solid" %sdl-render-text-solid)
+    :pointer
   (font :pointer)
   (text :string)
-  (r :uint8)
-  (g :uint8)
-  (b :uint8)
-  (a :uint8))
+  (color (:struct sdl-color)))
 
-(defun render-text-solid (font text r g b a)
-  (%sdl-render-text-solid (autowrap:ptr font) text r g b a))
+(defun render-text-solid (font text color)
+  (%sdl-render-text-solid (autowrap:ptr font) text color))

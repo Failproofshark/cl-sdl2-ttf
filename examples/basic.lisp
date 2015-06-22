@@ -8,16 +8,16 @@
     (sdl2-ttf:init)
     (with-window (the-window :title "Basic Font Example" :w 300 :h 300 :flags '(:shown))
       (let* ((font (sdl2-ttf:open-font (asdf:system-relative-pathname 'sdl2-ttf-examples "examples/PROBE_10PX_OTF.otf") 10))
-             (destination-rect (make-rect 150
-                                          150
+             (destination-rect (make-rect 0
+                                          0
                                           200
-                                          200))
+                                          20))
              (hello-text (sdl2-ttf:render-text-solid font
                                                      "hello world"
-                                                     255
-                                                     255
-                                                     255
-                                                     0)))
+                                                     '(sdl2-ttf::r 255
+                                                       sdl2-ttf::g 255
+                                                       sdl2-ttf::b 255
+                                                       sdl2-ttf::a 0))))
         (with-renderer (my-renderer the-window :flags '(:accelerated))
           (flet ((text-renderer (renderer)
                    (render-copy my-renderer
