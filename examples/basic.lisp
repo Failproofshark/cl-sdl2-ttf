@@ -10,15 +10,21 @@
       (let* ((font (sdl2-ttf:open-font (asdf:system-relative-pathname 'sdl2-ttf-examples "examples/PROBE_10PX_OTF.otf") 10))
              (destination-rect (make-rect 150
                                           150
-                                          50
-                                          50))
+                                          200
+                                          200))
              (hello-text (sdl2-ttf:render-text-solid font
                                                      "hello world"
-                                                     '(255 255 255 0))))
+                                                     255
+                                                     255
+                                                     255
+                                                     0)))
         (with-renderer (my-renderer the-window :flags '(:accelerated))
           (flet ((text-renderer (renderer)
-                   (set-render-draw-color renderer 255 255 255 0)
-                   (render-fill-rect renderer destination-rect))
+                   (render-copy my-renderer
+                                (create-texture-from-surface my-renderer
+                                                             hello-text)
+                                :source-rect (cffi:null-pointer)
+                                :dest-rect destination-rect))
                  (clear-renderer (renderer)
                    (set-render-draw-color renderer 0 0 0 255)
                    (render-clear renderer)))
@@ -31,4 +37,5 @@
                      (when (> (sdl2-ttf:was-init) 0)
                        (sdl2-ttf:close-font font)
                        (sdl2-ttf:quit))
+                     (cffi:foreign-free hello-text)
                      t))))))))

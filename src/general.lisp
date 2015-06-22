@@ -28,15 +28,19 @@
   "Frees the memory used by the ttf-font-struct"
   (ttf-close-font ttf-font-struct))
 
-;;TODO have a unified rendering function for solid, shaded, and blended and have which mode as a simple argument
-;;TODO add support for utf-8 and other encoding
-(defun render-text-solid (font text color)
-  "Create an sdl-surface with the text rendered in the font and a list of integers representing the col passed in."
-  (cffi:with-foreign-pointer (sdl-color 4)
-    (loop for i from 0 upto (- (length color) 1) do
-         (setf (cffi:mem-aref sdl-color :uint8 i) (nth i color)))
-    (autocollect (ptr)
-        (check-null (ttf-render-text-solid font
-                                           text
-                                           sdl-color))
-      (sdl2:free-surface ptr))))
+(cffi:defcstruct sdl-color
+  (r :uint8)
+  (g :uint8)
+  (b :uint8)
+  (a :uint8))
+
+(cffi:defcfun ("TTF_RenderText_Solid" %sdl-render-text-solid) :pointer
+  (font :pointer)
+  (text :string)
+  (r :uint8)
+  (g :uint8)
+  (b :uint8)
+  (a :uint8))
+
+(defun render-text-solid (font text r g b a)
+  (%sdl-render-text-solid (autowrap:ptr font) text r g b a))
