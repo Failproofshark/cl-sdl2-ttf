@@ -11,4 +11,5 @@
            #:quit
            #:open-font
            #:close-font
-           #:render-text-solid))
+           #:render-text-solid
+           #:create-solid-open-gl-text))

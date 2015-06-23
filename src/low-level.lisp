@@ -13,9 +13,3 @@
   (font :pointer)
   (text :string)
   (color (:struct sdl-color)))
-
-(cffi:defcfun ("TTF_RenderUTF8_Solid" %sdl-render-utf8-solid)
-    :pointer
-  (font :pointer)
-  (text :string)
-  (color (:struct sdl-color)))

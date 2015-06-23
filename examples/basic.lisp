@@ -38,7 +38,6 @@
                      (render-present my-renderer))
               (:quit ()
                      (when (> (sdl2-ttf:was-init) 0)
-                       (format t "cleaning")
                        (sdl2-ttf:close-font font)
                        (destroy-texture hello-text)
                        (sdl2-ttf:quit))
