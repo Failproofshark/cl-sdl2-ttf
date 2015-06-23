@@ -15,6 +15,7 @@
                  (:file "library")
                  (:file "autowrap")
                  (:file "conditions")
+                 (:file "low-level")
                  (:file "general")
                  (:module autowrap-spec
                           :pathname "spec"
