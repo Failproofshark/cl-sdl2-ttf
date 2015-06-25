@@ -12,4 +12,5 @@
            #:open-font
            #:close-font
            #:render-text-solid
-           #:create-solid-open-gl-text))
+           #:render-text-blended
+           #:create-open-gl-text))

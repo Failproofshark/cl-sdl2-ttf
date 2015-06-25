@@ -27,12 +27,12 @@
         ;;the texture-surface is the actual loaded image object
         (let* ((font (sdl2-ttf:open-font (asdf:system-relative-pathname 'sdl2-ttf-examples "examples/PROBE_10PX_OTF.otf")
                                          10))
-               (texture-surface (sdl2-ttf:create-solid-open-gl-text font
-                                                                    "hello world"
-                                                                    255
-                                                                    255
-                                                                    255
-                                                                    0))
+               (texture-surface (sdl2-ttf:create-open-gl-text font
+                                                              "hello world"
+                                                              255
+                                                              0
+                                                              0
+                                                              0))
                ;;The first buffer is our verticies, the second is our elements
                (buffers (gl:gen-buffers 2))
                (vao (car (gl:gen-vertex-arrays 1)))
@@ -87,8 +87,8 @@
 
           ;;Binding the texture object for configuration
           (gl:bind-texture :texture-2d texture)
-          (gl:tex-parameter :texture-2d :texture-wrap-s :repeat)
-          (gl:tex-parameter :texture-2d :texture-wrap-t :repeat)
+          (gl:tex-parameter :texture-2d :texture-wrap-s :clamp-to-border)
+          (gl:tex-parameter :texture-2d :texture-wrap-t :clamp-to-border)
           (gl:generate-mipmap :texture-2d)
           (gl:tex-parameter :texture-2d :texture-min-filter :linear)
           (gl:tex-parameter :texture-2d :texture-mag-filter :linear)
@@ -101,7 +101,6 @@
                            :rgba
                            :unsigned-byte
                            (surface-pixels texture-surface))
-
           (gl:bind-buffer :element-array-buffer (second buffers))
           (gl:buffer-data :element-array-buffer :static-draw *element-attribute-array*)
 
@@ -115,8 +114,8 @@
                    (gl-swap-window my-window))
             (:quit ()
                    (when (> (sdl2-ttf:was-init) 0)
-                       (sdl2-ttf:close-font font)
-                       (free-surface texture-surface)
-                       (sdl2-ttf:quit))
+                     (sdl2-ttf:close-font font)
+                     (free-surface texture-surface)
+                     (sdl2-ttf:quit))
                    (gl:disable-vertex-attrib-array (gl:get-attrib-location shader-program "position"))
                    t)))))))

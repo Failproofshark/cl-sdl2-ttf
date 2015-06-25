@@ -8,8 +8,21 @@
   (b :uint8)
   (a :uint8))
 
-(cffi:defcfun ("TTF_RenderText_Solid" %sdl-render-text-solid)
-    :pointer
-  (font :pointer)
-  (text :string)
-  (color (:struct sdl-color)))
+(defmacro define-render-function (encoding style)
+  (let* ((foreign-function-name (format 'nil
+                                       "TTF_Render~a_~a"
+                                       encoding
+                                       style))
+         (wrapper-function-name (string-upcase (format 'nil
+                                                       "render-~a-~a"
+                                                       encoding
+                                                       style)))
+         (name-conversion (concatenate 'string "%SDL-" wrapper-function-name)))
+    `(cffi:defcfun (,foreign-function-name ,(intern name-conversion))
+         :pointer
+       (font :pointer)
+       (text :string)
+       (color (:struct sdl-color)))))
+
+(define-render-function "Text" "Solid")
+(define-render-function "Text" "Blended")
