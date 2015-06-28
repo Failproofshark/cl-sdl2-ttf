@@ -27,12 +27,12 @@
         ;;the texture-surface is the actual loaded image object
         (let* ((font (sdl2-ttf:open-font (asdf:system-relative-pathname 'sdl2-ttf-examples "examples/PROBE_10PX_OTF.otf")
                                          10))
-               (texture-surface (sdl2-ttf:create-open-gl-text font
-                                                              "hello world"
-                                                              255
-                                                              0
-                                                              0
-                                                              0))
+               (texture-surface (sdl2-ttf:render-text-blended font
+                                                            "hello world"
+                                                            0
+                                                            255
+                                                            0
+                                                            0))
                ;;The first buffer is our verticies, the second is our elements
                (buffers (gl:gen-buffers 2))
                (vao (car (gl:gen-vertex-arrays 1)))
@@ -40,6 +40,9 @@
                (vertex-shader (gl:create-shader :vertex-shader))
                (fragment-shader (gl:create-shader :fragment-shader))
                (shader-program (gl:create-program)))
+
+          (gl:enable :blend)
+          (gl:blend-func :src-alpha :one-minus-src-alpha)
           
           (gl:shader-source vertex-shader (read-file-into-string (asdf:system-relative-pathname 'opengl-shader-test
                                                                                            "texture-vertex-shader.glsl")))
@@ -100,6 +103,7 @@
                            0
                            :rgba
                            :unsigned-byte
+                           ;;Note this does NOT need to be freed because it's a dereferenced pointer belonging to struct, not a pointer to a pointer! It will be freed when free-surface is called later
                            (surface-pixels texture-surface))
           (gl:bind-buffer :element-array-buffer (second buffers))
           (gl:buffer-data :element-array-buffer :static-draw *element-attribute-array*)
