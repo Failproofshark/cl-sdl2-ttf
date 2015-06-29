@@ -29,27 +29,3 @@
   (tg:cancel-finalization ttf-font-struct)
   (ttf-close-font ttf-font-struct)
   (autowrap:invalidate ttf-font-struct))
-
-(defun render-text-solid (font text red green blue alpha)
-  "Renders some text with solid strokes in the style of a particular font (a ttf-font pointer) and color (given as separate red, green, blue, and alpha components. Returns an surface pointer"
-  (autocollect (ptr)
-      ;;We need to wrap this manually since we are providing the function ourselves
-      (check-null (sdl2-ffi::make-sdl-surface :ptr (%sdl-render-text-solid (autowrap:ptr font)
-                                                                           text
-                                                                           `(r ,red
-                                                                               g ,green
-                                                                               b ,blue
-                                                                               a ,alpha))))
-    (sdl2:free-surface ptr)))
-
-(defun render-text-blended (font text red green blue alpha)
-  "Renders some text with solid strokes in the style of a particular font (a ttf-font pointer) and color (given as separate red, green, blue, and alpha components. Returns an surface pointer"
-  (autocollect (ptr)
-      ;;We need to wrap this manually since we are providing the function ourselves
-      (check-null (sdl2-ffi::make-sdl-surface :ptr (%sdl-render-text-blended (autowrap:ptr font)
-                                                                           text
-                                                                           `(r ,red
-                                                                               g ,green
-                                                                               b ,blue
-                                                                               a ,alpha))))
-    (sdl2:free-surface ptr)))

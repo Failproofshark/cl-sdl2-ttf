@@ -10,7 +10,4 @@
            #:was-init
            #:quit
            #:open-font
-           #:close-font
-           #:render-text-solid
-           #:render-text-blended
-           #:create-open-gl-text))
+           #:close-font))

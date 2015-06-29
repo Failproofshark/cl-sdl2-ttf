@@ -8,21 +8,40 @@
   (b :uint8)
   (a :uint8))
 
+(defun create-sdl-color-list (red green blue alpha)
+  `(r ,red
+    g ,green
+    b ,blue
+    a ,alpha))
+
 (defmacro define-render-function (encoding style)
   (let* ((foreign-function-name (format 'nil
                                        "TTF_Render~a_~a"
                                        encoding
                                        style))
-         (wrapper-function-name (string-upcase (format 'nil
-                                                       "render-~a-~a"
-                                                       encoding
-                                                       style)))
-         (name-conversion (concatenate 'string "%SDL-" wrapper-function-name)))
-    `(cffi:defcfun (,foreign-function-name ,(intern name-conversion))
-         :pointer
-       (font :pointer)
-       (text :string)
-       (color (:struct sdl-color)))))
+         (wrapper-function-name (intern (string-upcase (format 'nil
+                                                               "render-~a-~a"
+                                                               encoding
+                                                               style))))
+         (low-level-lisp-name (intern (concatenate 'string
+                                               "%SDL-"
+                                               (symbol-name wrapper-function-name)))))
+    `(progn (cffi:defcfun (,foreign-function-name ,low-level-lisp-name)
+                :pointer
+              (font :pointer)
+              (text :string)
+              (color (:struct sdl-color)))
+            (defun ,wrapper-function-name (font text red green blue alpha)
+              (autocollect (ptr)
+                  ;;We need to wrap this manually since we are providing the function ourselves
+                  (check-null (sdl2-ffi::make-sdl-surface :ptr (,low-level-lisp-name (autowrap:ptr font)
+                                                                                     text
+                                                                                     (create-sdl-color-list red
+                                                                                                            green
+                                                                                                            blue
+                                                                                                            alpha))))
+                (sdl2:free-surface ptr)))
+            (export ',wrapper-function-name))))
 
 (define-render-function "Text" "Solid")
 (define-render-function "Text" "Blended")
