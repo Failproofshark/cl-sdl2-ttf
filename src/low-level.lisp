@@ -45,3 +45,15 @@
 
 (define-render-function "Text" "Solid")
 (define-render-function "Text" "Blended")
+(define-render-function "Text" "Shaded")
+(define-render-function "UTF8" "Solid")
+(define-render-function "UTF8" "Blended")
+(define-render-function "UTF8" "Shaded")
+(define-render-function "UNICODE" "Solid")
+(define-render-function "UNICODE" "Blended")
+(define-render-function "UNICODE" "Shaded")
+(define-render-function "Glyph" "Solid")
+(define-render-function "Glyph" "Blended")
+(define-render-function "Glyph" "Shaded")
+
+

@@ -3,10 +3,10 @@
 This is a wrapper for the SDL2_TTF library used for loading fonts and creating text assets.
 
 ## Usage
-To be documented
+To Be Documented
 
 ## Examples
-There is one example using plain old SDL renderers. TO run it load the `sdl2-ttf-examples` package and run `(ttf-examples:basic-example)`
+There are two example one using sdl renderers while the other uses OpenGL. To run it load the `sdl2-ttf-examples` package and run `(ttf-examples:basic-example)` or `(ttf-examples:gl-example)`
 
 
 ##Credits
