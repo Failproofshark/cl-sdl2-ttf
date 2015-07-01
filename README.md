@@ -10,18 +10,25 @@ This is a wrapper for the SDL2_TTF library used for loading fonts and creating t
 * `(sdl2-ttf:quit): Cleans up the TTF API. Calls [TTF_Quit](https://www.libsdl.org/projects/SDL_ttf/docs/SDL_ttf.html#SEC10)
 * `(sdl2-ttf:open-font path-to-font point-size)`: Open a font specified by the path specifier path-to-font sized to integer point-size (based on 72DPI). Returns a ttf-font struct and null on errors. Calls [TTF_OpenFont](https://www.libsdl.org/projects/SDL_ttf/docs/SDL_ttf.html#SEC14)
 * `(sdl2-ttf:close-font ttf-font-struct)`: Frees the memory associated with a given font struct. Calls [TTF_CloseFont](https://www.libsdl.org/projects/SDL_ttf/docs/SDL_ttf.html#SEC18)
+
 ### Rendering functions.
+
 #### How SDL TTF renders fonts
 Text is rendered by calling one of 12 methods, each one specifying a type of text
+
 * Text which refers to LATIN1 encoding
 * UTF8 which refers to UTF8 encoding
 * UNICODE which refers to unicode encoding (text)
 * Glyph, which is unicode encoding (glyphs)
+
 as well as specfying one rendering method
+
 * Solid
 * Shaded
 * Blended
+
 For example, solid LATIN1 text is `TTF_RenderText_Solid`, while blended UTF8 text is `TTF_RenderUTF8_Blended`. This library follows a more traditional Lisp function name structure and omits the TTF before every function. So the above two functions are `render-text-solid` and `render-utf8-blended` respectively. Each method takes the font, created with `open-font`, the text should be rendered in, the text to be rendered, and the red, green blue and alpha components of the color to render in. More in-depth coverage about the rendering methods and the functions themselves are detailed [here](https://www.libsdl.org/projects/SDL_ttf/docs/SDL_ttf.html#SEC42). Below is a list of functions provided by the wrapper
+
 * render-text-solid
 * render-utf8-solid
 * render-unicode-solid
@@ -34,6 +41,7 @@ For example, solid LATIN1 text is `TTF_RenderText_Solid`, while blended UTF8 tex
 * render-utf8-blended
 * render-unicode-blended
 * render-glyph-blended
+
 #### Usage with Open GL
 Each of the rendering functions returns a surface, however the only one useful for rendering in Open GL are the blended methods, as they produce an ARGB surface. Solid and blended provide a rather strange RGB formatted surface that does something with the alpha you pass in during the rendering call, which does some calculation that my lead to unexpected behavior (if you find otherwise please, let me know). Once you have obtained a surface simply use `surface-pixels` to obtain the raw pixel data to texture your surface. Note in order for the colors to be correct please be sure to enable blending and chose an appropriate blending function.
 
