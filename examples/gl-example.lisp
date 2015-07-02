@@ -29,9 +29,9 @@
                                          10))
                (texture-surface (sdl2-ttf:render-text-blended font
                                                             "hello world"
-                                                            0
                                                             255
-                                                            0
+                                                            255
+                                                            255
                                                             0))
                ;;The first buffer is our verticies, the second is our elements
                (buffers (gl:gen-buffers 2))
@@ -44,12 +44,13 @@
           (gl:enable :blend)
           (gl:blend-func :src-alpha :one-minus-src-alpha)
           
-          (gl:shader-source vertex-shader (read-file-into-string (asdf:system-relative-pathname 'opengl-shader-test
-                                                                                           "texture-vertex-shader.glsl")))
+          (gl:shader-source vertex-shader (read-file-into-string (asdf:system-relative-pathname 'sdl2-ttf-examples
+                                                                                           "examples/texture-vertex-shader.glsl")))
           (gl:compile-shader vertex-shader)
+          (print (gl:get-shader-info-log vertex-shader))
           
-          (gl:shader-source fragment-shader (read-file-into-string (asdf:system-relative-pathname 'opengl-shader-test
-                                                                                             "texture-fragment-shader.glsl")))
+          (gl:shader-source fragment-shader (read-file-into-string (asdf:system-relative-pathname 'sdl2-ttf-examples
+                                                                                             "examples/texture-fragment-shader.glsl")))
           (gl:compile-shader fragment-shader)
           
           (gl:attach-shader shader-program vertex-shader)
