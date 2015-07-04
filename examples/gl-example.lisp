@@ -2,6 +2,7 @@
 
 (require :cl-opengl)
 (require :sdl2-ttf)
+(require :mathkit)
 
 (defun create-gl-array (type lisp-array)
   (let ((gl-array (gl:alloc-gl-array type (length lisp-array))))
@@ -10,12 +11,17 @@
     gl-array))
 
 ;;Text, as texutres, are loaded upside down and mirrored. Plan accordingly!
-(defparameter *vertex-attribute-array* (create-gl-array :float #(-0.5 -0.5 1.0 1.0 1.0 0.0 1.0
-                                                                  0.5 -0.5 1.0 1.0 1.0 1.0 1.0
-                                                                 -0.5  0.5 1.0 1.0 1.0 0.0 0.0
-                                                                  0.5  0.5 1.0 1.0 1.0 1.0 0.0)))
+(defparameter *vertex-color-texture-array* (create-gl-array :float #(1.0 1.0 1.0 0.0 1.0
+                                                                     1.0 1.0 1.0 1.0 1.0
+                                                                     1.0 1.0 1.0 0.0 0.0
+                                                                     1.0 1.0 1.0 1.0 0.0)))
+
+;;since we're using an orthographic projection we need the width and height of our texture
+(defparameter *vertex-position-array* 'nil)
 
 (defparameter *element-attribute-array* (create-gl-array :unsigned-short #(0 1 2 3)))
+
+(defparameter *projection-matrix* (kit.math:ortho-matrix 0 300 0 300 -10 10))
 
 (defun gl-example ()
   (with-init (:everything)
@@ -34,7 +40,7 @@
                                                             255
                                                             0))
                ;;The first buffer is our verticies, the second is our elements
-               (buffers (gl:gen-buffers 2))
+               (buffers (gl:gen-buffers 3))
                (vao (car (gl:gen-vertex-arrays 1)))
                (texture (car (gl:gen-textures 1)))
                (vertex-shader (gl:create-shader :vertex-shader))
@@ -48,7 +54,6 @@
                                                                                            "examples/texture-vertex-shader.glsl")))
           (gl:compile-shader vertex-shader)
           (print (gl:get-shader-info-log vertex-shader))
-          
           (gl:shader-source fragment-shader (read-file-into-string (asdf:system-relative-pathname 'sdl2-ttf-examples
                                                                                              "examples/texture-fragment-shader.glsl")))
           (gl:compile-shader fragment-shader)
@@ -59,25 +64,34 @@
           (gl:link-program shader-program)
           (gl:use-program shader-program)
 
+          (let ((width (/ (surface-width texture-surface) 2.0))
+                (height (/ (surface-height texture-surface) 2.0)))
+            (setf *vertex-position-array* (create-gl-array :float (make-array 8
+                                                                              :initial-contents `(,(- width) ,(- height)
+                                                                                                   ,width ,(- height)
+                                                                                                   ,(- width) ,height
+                                                                                                   ,width ,height)))))
           (gl:bind-vertex-array vao)
-          
           (gl:bind-buffer :array-buffer (first buffers))
-          (gl:buffer-data :array-buffer :static-draw *vertex-attribute-array*)
+          (gl:buffer-data :array-buffer :static-draw *vertex-position-array*)
           
           (gl:vertex-attrib-pointer (gl:get-attrib-location shader-program "position")
                                     2
                                     :float
                                     :false
-                                    (* 7 (cffi:foreign-type-size :float))
+                                    (* 2 (cffi:foreign-type-size :float))
                                     (cffi:null-pointer))
+
+          (gl:bind-buffer :array-buffer (second buffers))
+          (gl:buffer-data :array-buffer :static-draw *vertex-color-texture-array*)
           (gl:enable-vertex-attrib-array (gl:get-attrib-location shader-program "position"))
           
           (gl:vertex-attrib-pointer (gl:get-attrib-location shader-program "input_color")
                                     3
                                     :float
                                     :false
-                                    (* 7 (cffi:foreign-type-size :float))
-                                    (* 2 (cffi:foreign-type-size :float)))
+                                    (* 5 (cffi:foreign-type-size :float))
+                                    (cffi:null-pointer))
           (gl:enable-vertex-attrib-array (gl:get-attrib-location shader-program "input_color"))
           
           ;;Texture coordinates
@@ -85,9 +99,14 @@
                                     2
                                     :float
                                     :false
-                                    (* 7 (cffi:foreign-type-size :float))
-                                    (* 5 (cffi:foreign-type-size :float)))
+                                    (* 5 (cffi:foreign-type-size :float))
+                                    (* 3 (cffi:foreign-type-size :float)))
           (gl:enable-vertex-attrib-array (gl:get-attrib-location shader-program "tex_coord"))
+
+          ;;Bind the projection matrix
+          (gl:uniform-matrix (gl:get-uniform-location shader-program "projection_matrix")
+                             4
+                             (make-array 1 :initial-element *projection-matrix*))
 
           ;;Binding the texture object for configuration
           (gl:bind-texture :texture-2d texture)
@@ -106,7 +125,7 @@
                            :unsigned-byte
                            ;;Note this does NOT need to be freed because it's a dereferenced pointer belonging to struct, not a pointer to a pointer! It will be freed when free-surface is called later
                            (surface-pixels texture-surface))
-          (gl:bind-buffer :element-array-buffer (second buffers))
+          (gl:bind-buffer :element-array-buffer (third buffers))
           (gl:buffer-data :element-array-buffer :static-draw *element-attribute-array*)
 
           (with-event-loop (:method :poll)
@@ -122,5 +141,8 @@
                      (sdl2-ttf:close-font font)
                      (free-surface texture-surface)
                      (sdl2-ttf:quit))
+                   (gl:free-gl-array *vertex-position-array*)
+                   (gl:free-gl-array *vertex-color-texture-array*)
+                   (gl:free-gl-array *element-attribute-array*)
                    (gl:disable-vertex-attrib-array (gl:get-attrib-location shader-program "position"))
                    t)))))))

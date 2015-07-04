@@ -7,6 +7,8 @@ in vec3 input_color;
 out vec3 color_output;
 out vec2 tex_output;
 
+uniform mat4 projection_matrix;
+
 void main()
 {
     tex_output = tex_coord;

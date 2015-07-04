@@ -9,7 +9,7 @@
   :author "Bryan Baraoidan"
   :license "MIT"
   :version "1.0"
-  :depends-on (:alexandria :sdl2 :sdl2-ttf :cl-opengl)
+  :depends-on (:alexandria :sdl2 :sdl2-ttf :cl-opengl :mathkit)
   :pathname "examples"
   :components ((:file "package")
                (:file "basic" :depends-on ("package"))
