@@ -53,7 +53,7 @@
           (gl:shader-source vertex-shader (read-file-into-string (asdf:system-relative-pathname 'sdl2-ttf-examples
                                                                                            "examples/texture-vertex-shader.glsl")))
           (gl:compile-shader vertex-shader)
-          (print (gl:get-shader-info-log vertex-shader))
+
           (gl:shader-source fragment-shader (read-file-into-string (asdf:system-relative-pathname 'sdl2-ttf-examples
                                                                                              "examples/texture-fragment-shader.glsl")))
           (gl:compile-shader fragment-shader)
@@ -72,19 +72,19 @@
                                                                                                    ,(- width) ,height
                                                                                                    ,width ,height)))))
           (gl:bind-vertex-array vao)
+          
           (gl:bind-buffer :array-buffer (first buffers))
           (gl:buffer-data :array-buffer :static-draw *vertex-position-array*)
-          
           (gl:vertex-attrib-pointer (gl:get-attrib-location shader-program "position")
                                     2
                                     :float
                                     :false
                                     (* 2 (cffi:foreign-type-size :float))
                                     (cffi:null-pointer))
+          (gl:enable-vertex-attrib-array (gl:get-attrib-location shader-program "position"))
 
           (gl:bind-buffer :array-buffer (second buffers))
           (gl:buffer-data :array-buffer :static-draw *vertex-color-texture-array*)
-          (gl:enable-vertex-attrib-array (gl:get-attrib-location shader-program "position"))
           
           (gl:vertex-attrib-pointer (gl:get-attrib-location shader-program "input_color")
                                     3
@@ -93,7 +93,7 @@
                                     (* 5 (cffi:foreign-type-size :float))
                                     (cffi:null-pointer))
           (gl:enable-vertex-attrib-array (gl:get-attrib-location shader-program "input_color"))
-          
+           
           ;;Texture coordinates
           (gl:vertex-attrib-pointer (gl:get-attrib-location shader-program "tex_coord")
                                     2
@@ -106,7 +106,8 @@
           ;;Bind the projection matrix
           (gl:uniform-matrix (gl:get-uniform-location shader-program "projection_matrix")
                              4
-                             (make-array 1 :initial-element *projection-matrix*))
+                             (make-array 1 :initial-element *projection-matrix*)
+                             'nil)
 
           ;;Binding the texture object for configuration
           (gl:bind-texture :texture-2d texture)
@@ -145,4 +146,6 @@
                    (gl:free-gl-array *vertex-color-texture-array*)
                    (gl:free-gl-array *element-attribute-array*)
                    (gl:disable-vertex-attrib-array (gl:get-attrib-location shader-program "position"))
+                   (gl:disable-vertex-attrib-array (gl:get-attrib-location shader-program "input_color"))
+                   (gl:disable-vertex-attrib-array (gl:get-attrib-location shader-program "tex_coord"))
                    t)))))))
