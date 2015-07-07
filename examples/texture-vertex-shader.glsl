@@ -7,11 +7,11 @@ in vec3 input_color;
 out vec3 color_output;
 out vec2 tex_output;
 
-uniform mat4 projection_matrix;
+uniform mat4 mvp;
 
 void main()
 {
     tex_output = tex_coord;
     color_output = input_color;
-    gl_Position = projection_matrix * vec4(position, 0.0, 1.0);
+    gl_Position = mvp * vec4(position, 0.0, 1.0);
 }

@@ -22,6 +22,8 @@
 (defparameter *element-attribute-array* (create-gl-array :unsigned-short #(0 1 2 3)))
 
 (defparameter *projection-matrix* (kit.math:ortho-matrix 0 300 0 300 -10 10))
+;;TRANSLATE IT YOU FOOL!
+(defparameter *translation-matrix* (sb-cga:translate* 150.0 150.0 0.0))
 
 (defun gl-example ()
   (with-init (:everything)
@@ -104,9 +106,9 @@
           (gl:enable-vertex-attrib-array (gl:get-attrib-location shader-program "tex_coord"))
 
           ;;Bind the projection matrix
-          (gl:uniform-matrix (gl:get-uniform-location shader-program "projection_matrix")
+          (gl:uniform-matrix (gl:get-uniform-location shader-program "mvp")
                              4
-                             (make-array 1 :initial-element *projection-matrix*)
+                             (vector (sb-cga:matrix* *projection-matrix* *translation-matrix*))
                              'nil)
 
           ;;Binding the texture object for configuration
@@ -142,9 +144,6 @@
                      (sdl2-ttf:close-font font)
                      (free-surface texture-surface)
                      (sdl2-ttf:quit))
-                   (gl:free-gl-array *vertex-position-array*)
-                   (gl:free-gl-array *vertex-color-texture-array*)
-                   (gl:free-gl-array *element-attribute-array*)
                    (gl:disable-vertex-attrib-array (gl:get-attrib-location shader-program "position"))
                    (gl:disable-vertex-attrib-array (gl:get-attrib-location shader-program "input_color"))
                    (gl:disable-vertex-attrib-array (gl:get-attrib-location shader-program "tex_coord"))
