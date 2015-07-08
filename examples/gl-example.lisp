@@ -22,7 +22,7 @@
 (defparameter *element-attribute-array* (create-gl-array :unsigned-short #(0 1 2 3)))
 
 (defparameter *projection-matrix* (kit.math:ortho-matrix 0 300 0 300 -10 10))
-;;TRANSLATE IT YOU FOOL!
+
 (defparameter *translation-matrix* (sb-cga:translate* 150.0 150.0 0.0))
 
 (defun gl-example ()
@@ -144,6 +144,8 @@
                      (sdl2-ttf:close-font font)
                      (free-surface texture-surface)
                      (sdl2-ttf:quit))
+                   (gl:disable-vertex-attrib-array vao)
+                   (gl:delete-buffers buffers)
                    (gl:disable-vertex-attrib-array (gl:get-attrib-location shader-program "position"))
                    (gl:disable-vertex-attrib-array (gl:get-attrib-location shader-program "input_color"))
                    (gl:disable-vertex-attrib-array (gl:get-attrib-location shader-program "tex_coord"))
