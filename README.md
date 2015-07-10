@@ -7,7 +7,7 @@ This is a wrapper for the SDL2_TTF library used for loading fonts and creating t
 * `(sdl2-ttf:init)`: Initializes the SDL TTF module. While this needs to be called prior to any subsequent SDL TTF function calls, (with the exception of was-init or linked-version), it does *not* require the main SDL library to be initialized first. Calls [TTF_Init](https://www.libsdl.org/projects/SDL_ttf/docs/SDL_ttf.html#SEC6)
 * `(sdl2-ttf:was-init)`: Returns 1 if initialized zero otherwise. Calls [TTF_WasInit](https://www.libsdl.org/projects/SDL_ttf/docs/SDL_ttf.html#SEC9)
 * `(sdl2-ttf:linked-version)`:  Returns the linked version Major Minor and Patch. Useful for debugging. Calls [TTF_Linked_Version](https://www.libsdl.org/projects/SDL_ttf/docs/SDL_ttf.html#SEC7)
-* `(sdl2-ttf:quit): Cleans up the TTF API. Calls [TTF_Quit](https://www.libsdl.org/projects/SDL_ttf/docs/SDL_ttf.html#SEC10)
+* `(sdl2-ttf:quit)`: Cleans up the TTF API. Calls [TTF_Quit](https://www.libsdl.org/projects/SDL_ttf/docs/SDL_ttf.html#SEC10)
 * `(sdl2-ttf:open-font path-to-font point-size)`: Open a font specified by the path specifier path-to-font sized to integer point-size (based on 72DPI). Returns a ttf-font struct and null on errors. Calls [TTF_OpenFont](https://www.libsdl.org/projects/SDL_ttf/docs/SDL_ttf.html#SEC14)
 * `(sdl2-ttf:close-font ttf-font-struct)`: Frees the memory associated with a given font struct. Calls [TTF_CloseFont](https://www.libsdl.org/projects/SDL_ttf/docs/SDL_ttf.html#SEC18)
 
