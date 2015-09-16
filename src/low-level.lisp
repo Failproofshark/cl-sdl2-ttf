@@ -55,5 +55,3 @@
 (define-render-function "Glyph" "Solid")
 (define-render-function "Glyph" "Blended")
 (define-render-function "Glyph" "Shaded")
-
-
