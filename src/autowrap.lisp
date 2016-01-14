@@ -7,5 +7,11 @@
                     :include-sources ("SDL_ttf.h")
                     :symbol-exceptions (("SDL_RWops" . "SDL-RWOPS"))
                     :exclude-constants ("^+__")
+		    :exclude-definitions ("_inline$"
+					  "^_mm_"
+					  "^__"
+					  "va_list"
+					  "_gnuc_va_list")
                     ;;We're mostly dealing with SDL-surface which contains accessors in the main cl-sdl2 library
-                    :no-accessors t)
+                    :no-accessors cl:t
+		    :release-p cl:t)
