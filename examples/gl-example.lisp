@@ -18,12 +18,12 @@
         (gl-make-current my-window gl-context)
         (gl:viewport 0 0 300 300)
         ;;the texture-surface is the actual loaded image object
-        (let* ((vertex-color-texture-array (create-gl-array :float #(1.0 1.0 1.0 0.0 1.0
-                                                                     1.0 1.0 1.0 1.0 1.0
-                                                                     1.0 1.0 1.0 0.0 0.0
-                                                                     1.0 1.0 1.0 1.0 0.0)))
+        (let* ((vertex-color-texture-array (create-gl-array :float #(1.0 1.0 1.0 0.0 0.0
+                                                                     1.0 1.0 1.0 1.0 0.0
+                                                                     1.0 1.0 1.0 0.0 1.0
+                                                                     1.0 1.0 1.0 1.0 1.0)))
                (element-attribute-array (create-gl-array :unsigned-short #(0 1 2 3)))
-               (projection-matrix (kit.math:ortho-matrix 0 300 0 300 -10 10))
+               (projection-matrix (kit.math:ortho-matrix 0 300 300 0 -10 10))
                (translation-matrix (sb-cga:translate* 150.0 150.0 0.0))
                (font (sdl2-ttf:open-font (asdf:system-relative-pathname 'sdl2-ttf-examples "examples/PROBE_10PX_OTF.otf")
                                          10))
@@ -63,8 +63,8 @@
                  (vertex-position-array (create-gl-array :float (make-array 8
                                                                             :initial-contents `(,(- width) ,(- height)
                                                                                                  ,width ,(- height)
-                                                                                                 ,(- width) ,height
-                                                                                                 ,width ,height)))))
+                                                                                                ,(- width) ,height
+                                                                                                ,width ,height)))))
             (gl:bind-vertex-array vao)
             
             (gl:bind-buffer :array-buffer (first buffers))
