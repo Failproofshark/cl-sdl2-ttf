@@ -25,10 +25,6 @@
        ,@body)
      (export ',wrapper-name)))
 
-(defun function-symbol (&rest strings)
-  (values (intern (string-upcase (apply #'concatenate
-                                        (cons 'string (mapcar #'string strings)))))))
-
 (defmacro define-render-function (style encoding)
   (let* ((foreign-function-name (format 'nil "TTF_Render~a_~a" encoding style))
          (wrapper-function-name (function-symbol "render-" encoding "-" style))
