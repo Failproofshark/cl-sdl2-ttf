@@ -14,6 +14,7 @@
     :components ((:file "package")
                  (:file "library")
                  (:file "autowrap")
+                 (:file "helpers")
                  (:file "conditions")
                  (:file "low-level")
                  (:file "general")
