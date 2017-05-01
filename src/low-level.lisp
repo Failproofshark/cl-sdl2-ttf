@@ -25,18 +25,14 @@
        ,@body)
      (export ',wrapper-name)))
 
-(defmacro define-render-function (encoding style)
-  (let* ((foreign-function-name (format 'nil
-                                        "TTF_Render~a_~a"
-                                        encoding
-                                        style))
-         (wrapper-function-name (intern (string-upcase (format 'nil
-                                                               "render-~a-~a"
-                                                               encoding
-                                                               style))))
-         (low-level-lisp-name (intern (concatenate 'string
-                                                   "%SDL-"
-                                                   (symbol-name wrapper-function-name)))))
+(defun function-symbol (&rest strings)
+  (values (intern (string-upcase (apply #'concatenate
+                                        (cons 'string (mapcar #'string strings)))))))
+
+(defmacro define-render-function (style encoding)
+  (let* ((foreign-function-name (format 'nil "TTF_Render~a_~a" encoding style))
+         (wrapper-function-name (function-symbol "render-" encoding "-" style))
+         (low-level-lisp-name (function-symbol "%sdl-" wrapper-function-name)))
     `(define-function ,foreign-function-name ,wrapper-function-name ,low-level-lisp-name
          :pointer
          ((font :pointer) (text :string) (color (:struct sdl-color)))
@@ -52,12 +48,35 @@
                                                                           alpha))))
          (sdl2:free-surface ptr)))))
 
+;;Shaded functions require a separate macro because issue #2 (bg and fg colors)
+;;There is some repeated code here
+(defmacro define-shaded-render-function (encoding)
+  (let* ((style "Shaded")
+         (foreign-function-name (format 'nil "TTF_Render~a_~a" encoding style))
+         (wrapper-function-name (function-symbol "render-" encoding "-" style))
+         (low-level-lisp-name (function-symbol "%sdl-" wrapper-function-name)))
+    `(define-function ,foreign-function-name ,wrapper-function-name ,low-level-lisp-name
+         :pointer
+         ((font :pointer) (text :string) (fg (:struct sdl-color)) (bg (:struct sdl-color)))
+         (font text fg-red fg-green fg-blue fg-alpha bg-red bg-green bg-blue bg-alpha)
+       (autocollect (ptr)
+           (check-null (sdl2-ffi::make-sdl-surface
+                        :ptr (,low-level-lisp-name (autowrap:ptr font)
+                                                   text
+                                                   (create-sdl-color-list fg-red
+                                                                          fg-green
+                                                                          fg-blue
+                                                                          fg-alpha)
+                                                   (create-sdl-color-list bg-red
+                                                                          bg-green
+                                                                          bg-blue
+                                                                          bg-alpha))))
+         (sdl2:free-surface ptr)))))
+  
 (defmacro define-size-function (encoding)
   (let* ((foreign-function-name (format 'nil "TTF_Size~a" encoding))
-         (wrapper-function-name (intern (string-upcase (format 'nil "size-~a" encoding))))
-         (low-level-lisp-name (intern (concatenate 'string
-                                                   "%SDL-"
-                                                   (symbol-name wrapper-function-name)))))
+         (wrapper-function-name (function-symbol "size-" encoding))
+         (low-level-lisp-name (function-symbol "%sdl-" wrapper-function-name)))
     `(define-function ,foreign-function-name ,wrapper-function-name ,low-level-lisp-name
          :int
          ((font :pointer) (text :string) (x :pointer) (y :pointer))
@@ -74,18 +93,20 @@
              (cffi:foreign-free data)
              (values x y))))))
 
-(define-render-function "Text" "Solid")
-(define-render-function "Text" "Blended")
-(define-render-function "Text" "Shaded")
-(define-render-function "UTF8" "Solid")
-(define-render-function "UTF8" "Blended")
-(define-render-function "UTF8" "Shaded")
-(define-render-function "UNICODE" "Solid")
-(define-render-function "UNICODE" "Blended")
-(define-render-function "UNICODE" "Shaded")
-(define-render-function "Glyph" "Solid")
-(define-render-function "Glyph" "Blended")
-(define-render-function "Glyph" "Shaded")
+(define-render-function "Solid" "Text")
+(define-render-function "Solid" "UTF8")
+(define-render-function "Solid" "UNICODE")
+(define-render-function "Solid" "Glyph")
+
+(define-render-function "Blended" "UTF8")
+(define-render-function "Blended" "Text")
+(define-render-function "Blended" "UNICODE")
+(define-render-function "Blended" "Glyph")
+
+(define-shaded-render-function "Text")
+(define-shaded-render-function "UTF8")
+(define-shaded-render-function "UNICODE")
+(define-shaded-render-function "Glyph")
 
 (define-size-function "Text")
 (define-size-function "UTF8")
