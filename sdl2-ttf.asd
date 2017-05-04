@@ -16,8 +16,10 @@
                  (:file "autowrap")
                  (:file "helpers")
                  (:file "conditions")
-                 (:file "low-level")
+                 (:file "render")
+                 (:file "size")
                  (:file "general")
+                 (:file "style")
                  (:module autowrap-spec
                           :pathname "spec"
                           :components ((:static-file "SDL2_ttf.h")))))

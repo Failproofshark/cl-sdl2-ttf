@@ -10,4 +10,5 @@
            #:was-init
            #:quit
            #:open-font
-           #:close-font))
+           #:close-font
+           #:bold #:italic #:underline #:strike-through))
