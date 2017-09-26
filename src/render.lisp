@@ -1,7 +1,7 @@
-(in-package :sdl2-ttf)
-
 ;;This file contains function definitions that could not be correctly wrapped by cl-autowrap
 ;;(mainly due to no support for pass by value as of writing 6-22-2015)
+
+(in-package :sdl2-ttf)
 
 (cffi:defcstruct (sdl-color)
   (r :uint8)
@@ -14,16 +14,6 @@
     g ,green
     b ,blue
     a ,alpha))
-
-(defmacro define-function (foreign-name wrapper-name low-level-name
-                           cffi-return cffi-arguments lisp-arguments &body body)
-  `(progn
-     (cffi:defcfun (,foreign-name ,low-level-name)
-         ,cffi-return
-       ,@cffi-arguments)
-     (defun ,wrapper-name ,lisp-arguments
-       ,@body)
-     (export ',wrapper-name)))
 
 (defmacro define-render-function (style encoding)
   (let* ((foreign-function-name (format 'nil "TTF_Render~a_~a" encoding style))
@@ -68,26 +58,6 @@
                                                                           bg-blue
                                                                           bg-alpha))))
          (sdl2:free-surface ptr)))))
-  
-(defmacro define-size-function (encoding)
-  (let* ((foreign-function-name (format 'nil "TTF_Size~a" encoding))
-         (wrapper-function-name (function-symbol "size-" encoding))
-         (low-level-lisp-name (function-symbol "%sdl-" wrapper-function-name)))
-    `(define-function ,foreign-function-name ,wrapper-function-name ,low-level-lisp-name
-         :int
-         ((font :pointer) (text :string) (x :pointer) (y :pointer))
-         (font text)
-         ;;TODO Is it there any better way than allocating memory to reference a pointer?
-         "Calculate the resulting surface size, returns (values width height)."
-         (let ((data (cffi:foreign-alloc :int :count 2)))
-           (check-rc (,low-level-lisp-name (autowrap:ptr font)
-                                           text
-                                           data
-                                           (cffi:inc-pointer data 4))) ; 4 is sizeof(int)
-           (let ((x (cffi:mem-aref data :int 0))
-                 (y (cffi:mem-aref data :int 1)))
-             (cffi:foreign-free data)
-             (values x y))))))
 
 (define-render-function "Solid" "Text")
 (define-render-function "Solid" "UTF8")
@@ -103,7 +73,3 @@
 (define-shaded-render-function "UTF8")
 (define-shaded-render-function "UNICODE")
 (define-shaded-render-function "Glyph")
-
-(define-size-function "Text")
-(define-size-function "UTF8")
-(define-size-function "UNICODE")
