@@ -32,7 +32,7 @@
                                                                           green
                                                                           blue
                                                                           alpha))))
-         (sdl2:free-surface ptr)))))
+         (sdl-free-surface ptr)))))
 
 ;;Shaded functions require a separate macro because issue #2 (bg and fg colors)
 ;;There is some repeated code here
@@ -57,7 +57,7 @@
                                                                           bg-green
                                                                           bg-blue
                                                                           bg-alpha))))
-         (sdl2:free-surface ptr)))))
+         (sdl-free-surface ptr)))))
 
 (define-render-function "Solid" "Text")
 (define-render-function "Solid" "UTF8")
