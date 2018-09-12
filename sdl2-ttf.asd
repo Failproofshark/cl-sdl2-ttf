@@ -8,7 +8,7 @@
     :author "Bryan Baraoidan"
     :license "MIT"
     :version "1.0"
-    :depends-on (:alexandria :defpackage-plus :cl-autowrap :sdl2 :cffi-libffi)
+    :depends-on (:alexandria :defpackage-plus :cl-autowrap :sdl2 :cffi-libffi :trivial-garbage)
     :pathname "src"
     :serial t
     :components ((:file "package")
