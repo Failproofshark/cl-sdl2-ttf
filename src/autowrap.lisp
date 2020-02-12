@@ -4,7 +4,8 @@
                     :function-package :sdl2-ffi.functions
                     :spec-path '(sdl2-ttf autowrap-spec)
                     :exclude-sources ("/usr/include/")
-                    :include-sources ("SDL_ttf.h")
+                    :include-sources ("SDL2_ttf.h")
+                    :sysincludes `,(append #+openbsd (list "/usr/X11R6/include"))
                     :symbol-exceptions (("SDL_RWops" . "SDL-RWOPS"))
                     :exclude-constants ("^+__")
 		    :exclude-definitions ("_inline$"
