@@ -11,4 +11,6 @@
            #:quit
            #:open-font
            #:close-font
-           #:bold #:italic #:underline #:strike-through))
+           #:bold #:italic #:underline #:strike-through
+	   #:set-font-outline
+	   #:get-font-outline))
