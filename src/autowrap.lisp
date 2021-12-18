@@ -5,6 +5,8 @@
                     :spec-path '(sdl2-ttf autowrap-spec)
                     :exclude-sources ("/usr/include/")
                     :include-sources ("SDL_ttf.h")
+		    :sysincludes `,(cl:append
+				    (cl:list (uiop:getenv "EXTRA_INCLUDES")))
                     :symbol-exceptions (("SDL_RWops" . "SDL-RWOPS"))
                     :exclude-constants ("^+__")
 		    :exclude-definitions ("_inline$"
