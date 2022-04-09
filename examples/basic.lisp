@@ -1,5 +1,6 @@
 (in-package :ttf-examples)
 
+#-lispworks
 (require 'sdl2-ttf)
 
 (defun basic-example ()

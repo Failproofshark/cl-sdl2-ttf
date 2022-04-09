@@ -1,5 +1,6 @@
 (in-package :sdl2-ttf)
 
+#-lispworks
 (require 'sdl2)
 
 (defvar *fonts* (list) "List of weak refs to fonts.")
@@ -17,27 +18,14 @@
   "Returns 1 if initialized zero otherwise."
   (ttf-was-init))
 
-(defun quit ()
-  (dolist (pointer *fonts*)
-    (let ((ttf-font-struct (tg:weak-pointer-value pointer)))
-      (when ttf-font-struct (close-font ttf-font-struct))))
-  (ttf-quit))
+(defun quit () (ttf-quit))
 
 (defun open-font (path-to-font point-size)
   "Open a font specified by the path specifier path-to-font sized to integer point-size (based on 72DPI). Returns a ttf-font struct and null on errors"
-  (let ((font (autocollect (ptr)
-                           (check-null (ttf-open-font (namestring path-to-font) point-size))
-                (ttf-close-font ptr))))
-    (push (tg:make-weak-pointer font) *fonts*)
-    font))
+  (check-null (ttf-open-font (namestring path-to-font) point-size)))
 
 (defun close-font (ttf-font-struct)
   "Frees the memory used by the ttf-font-struct"
-  (tg:cancel-finalization ttf-font-struct)
-  (setf *fonts*
-        (remove ttf-font-struct *fonts*
-                :key #'tg:weak-pointer-value
-                :test #'(lambda (l r)
-                          (cffi:pointer-eq (autowrap:ptr l) (autowrap:ptr r)))))
   (ttf-close-font ttf-font-struct)
   (autowrap:invalidate ttf-font-struct))
+
