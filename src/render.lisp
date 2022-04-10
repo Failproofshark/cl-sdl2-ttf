@@ -2,13 +2,6 @@
 ;;(mainly due to no support for pass by value as of writing 6-22-2015)
 
 (in-package :sdl2-ttf)
-#-lispworks
-(cffi:defcstruct (sdl-color)
-  (r :uint8)
-  (g :uint8)
-  (b :uint8)
-  (a :uint8))
-
 
 #-lispworks
 (defun create-sdl-color-list (red green blue alpha)
@@ -74,6 +67,13 @@
             (format nil "Unsupported encoding: ~A~%." encoding-str)))))
             
 #+lispworks
+(defun set-sdl-color (color-object red green blue alpha)
+  (setf (fli:foreign-slot-value color-object 'r) red)
+  (setf (fli:foreign-slot-value color-object 'g) green)
+  (setf (fli:foreign-slot-value color-object 'b) blue)
+  (setf (fli:foreign-slot-value color-object 'a) alpha))
+
+#+lispworks
 (defmacro define-render-function (style encoding)
   (let* ((foreign-function-name (format 'nil "TTF_Render~a_~a" encoding style))
          (wrapper-function-name (function-symbol "render-" encoding "-" style))
@@ -83,21 +83,36 @@
            ((font :pointer) (text :pointer) (color (:struct sdl-color)))
          :result-type :pointer)
        (defun ,wrapper-function-name (font text red green blue alpha)
-         (let ((color-object (fli:allocate-foreign-object :type 'sdl-color)))
-           (setf (fli:foreign-slot-value color-object 'r) red)
-           (setf (fli:foreign-slot-value color-object 'g) green)
-           (setf (fli:foreign-slot-value color-object 'b) blue)
-           (setf (fli:foreign-slot-value color-object 'a) alpha)
+         (fli:with-foreign-string (str-ptr str-ecnt str-bcnt :external-format (encoding-keyword ,encoding))
+             text
+           (fli:with-dynamic-foreign-objects ((color-object sdl-color))
+             (set-sdl-color color-object red green blue alpha)
+             (prog1
+                 (check-null
+                  (sdl2-ffi::make-sdl-surface
+                   :ptr (,low-level-lisp-name (autowrap:ptr font)
+                                              str-ptr
+                                              color-object)))))))
+       (export ',wrapper-function-name))))
+
+#+lispworks
+(defmacro define-render-function/glyph (style)
+  (let* ((foreign-function-name (format 'nil "TTF_RenderGlyph_~a" style))
+         (wrapper-function-name (function-symbol "render-glyph-" style))
+         (low-level-lisp-name (function-symbol "%sdl-" wrapper-function-name)))
+    `(progn
+       (fli:define-foreign-function (,low-level-lisp-name ,foreign-function-name)
+           ((font :pointer) (text :uint16) (color (:struct sdl-color)))
+         :result-type :pointer)
+       (defun ,wrapper-function-name (font lisp-char red green blue alpha)
+         (fli:with-dynamic-foreign-objects ((color-object sdl-color))
+           (set-sdl-color color-object red green blue alpha)
            (prog1
                (check-null
                 (sdl2-ffi::make-sdl-surface
                  :ptr (,low-level-lisp-name (autowrap:ptr font)
-                                              (fli:convert-to-foreign-string
-                                               text
-                                               :external-format (encoding-keyword ,encoding)
-                                               :allocation :static)
-                                              color-object)))
-             (fli:free-foreign-object color-object))))
+                                            (coerce (char-int lisp-char) '(unsigned-byte 16))
+                                            color-object))))))
        (export ',wrapper-function-name))))
 
 #+lispworks
@@ -112,28 +127,43 @@
          :result-type :pointer)
        (defun ,wrapper-function-name (font text fg-red fg-green fg-blue fg-alpha
                                            bg-red bg-green bg-blue bg-alpha)
-         (let ((color-object-fg (fli:allocate-foreign-object :type 'sdl-color))
-               (color-object-bg (fli:allocate-foreign-object :type 'sdl-color)))
-           (setf (fli:foreign-slot-value color-object-fg 'r) fg-red)
-           (setf (fli:foreign-slot-value color-object-fg 'g) fg-green)
-           (setf (fli:foreign-slot-value color-object-fg 'b) fg-blue)
-           (setf (fli:foreign-slot-value color-object-fg 'a) fg-alpha)
-           (setf (fli:foreign-slot-value color-object-bg 'r) bg-red)
-           (setf (fli:foreign-slot-value color-object-bg 'g) bg-green)
-           (setf (fli:foreign-slot-value color-object-bg 'b) bg-blue)
-           (setf (fli:foreign-slot-value color-object-bg 'a) bg-alpha)
+         (fli:with-foreign-string (str-ptr str-ecnt str-bcnt :external-format (encoding-keyword ,encoding))
+             text
+           (fli:with-dynamic-foreign-objects ((color-object-fg sdl-color)
+                                              (color-object-bg sdl-color))
+             (set-sdl-color color-object-fg fg-red fg-green fg-blue fg-alpha)
+             (set-sdl-color color-object-bg bg-red bg-green bg-blue bg-alpha)
+             (prog1
+                 (check-null
+                  (sdl2-ffi::make-sdl-surface
+                   :ptr (,low-level-lisp-name (autowrap:ptr font)
+                                              str-ptr 
+                                              color-object-fg
+                                              color-object-bg)))))))
+       (export ',wrapper-function-name))))
+
+#+lispworks
+(defmacro define-shaded-render-function/glyph ()
+  (let* ((foreign-function-name "TTF_RenderGlyph_Shaded")
+         (wrapper-function-name (function-symbol "render-glyph-shaded"))
+         (low-level-lisp-name (function-symbol "%sdl-" wrapper-function-name)))
+    `(progn
+       (fli:define-foreign-function (,low-level-lisp-name ,foreign-function-name)
+           ((font :pointer) (text :uint16) (fg-color (:struct sdl-color)) (bg-color (:struct sdl-color)))
+         :result-type :pointer)
+       (defun ,wrapper-function-name (font lisp-char fg-red fg-green fg-blue fg-alpha
+                                           bg-red bg-green bg-blue bg-alpha)
+         (fli:with-dynamic-foreign-objects ((color-object-fg sdl-color)
+                                            (color-object-bg sdl-color))
+           (set-sdl-color color-object-fg fg-red fg-green fg-blue fg-alpha)
+           (set-sdl-color color-object-bg bg-red bg-green bg-blue bg-alpha)
            (prog1
                (check-null
                 (sdl2-ffi::make-sdl-surface
                  :ptr (,low-level-lisp-name (autowrap:ptr font)
-                                              (fli:convert-to-foreign-string
-                                               text
-                                               :external-format (encoding-keyword ,encoding)
-                                               :allocation :static)
-                                              color-object-fg
-                                              color-object-bg)))
-             (fli:free-foreign-object color-object-fg)
-             (fli:free-foreign-object color-object-bg))))
+                                            (coerce (char-int lisp-char) '(unsigned-byte 16))
+                                            color-object-fg
+                                            color-object-bg))))))
        (export ',wrapper-function-name))))
 
 
@@ -141,14 +171,20 @@
 (define-render-function "Solid" "UTF8")
 (define-render-function "Solid" "UNICODE")
 #-lispworks
-(define-render-function "Solid" "Glyph")  
+(define-render-function "Solid" "Glyph")
+#+lispworks
+(define-render-function/glyph "Solid")
 (define-render-function "Blended" "UTF8")
 (define-render-function "Blended" "Text")
 (define-render-function "Blended" "UNICODE")
 #-lispworks
-(define-render-function "Blended" "Glyph")  
+(define-render-function "Blended" "Glyph")
+#+lispworks
+(define-render-function/glyph "Blended")
 (define-shaded-render-function "Text")
 (define-shaded-render-function "UTF8")
 (define-shaded-render-function "UNICODE")
 #-lispworks
 (define-shaded-render-function "Glyph")
+#+lispworks
+(define-shaded-render-function/glyph )
