@@ -1,7 +1,10 @@
 (in-package :ttf-examples)
 
+#-lispworks
 (require :cl-opengl)
+#-lispworks
 (require :sdl2-ttf)
+#-lispworks
 (require :mathkit)
 
 (defun create-gl-array (type lisp-array)
@@ -115,7 +118,7 @@
             (gl:tex-image-2d :texture-2d
                              0
                              :rgba
-                             (surface-width texture-surface)
+                             (/ (surface-pitch texture-surface) 4)
                              (surface-height texture-surface)
                              0
                              :rgba
