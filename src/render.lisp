@@ -3,6 +3,20 @@
 
 (in-package :sdl2-ttf)
 
+#+lispworks
+(fli:define-c-struct sdl-color
+  (r :byte)
+  (g :byte)
+  (b :byte)
+  (a :byte))
+
+#-lispworks
+(cffi:defcstruct (sdl-color)
+  (r :uint8)
+  (g :uint8)
+  (b :uint8)
+  (a :uint8))
+
 #-lispworks
 (defun create-sdl-color-list (red green blue alpha)
   `(r ,red
@@ -51,12 +65,8 @@
                                                                       bg-green
                                                                       bg-blue
                                                                       bg-alpha)))))))
-#+lispworks
-(fli:define-c-struct sdl-color
-  (r :byte)
-  (g :byte)
-  (b :byte)
-  (a :byte))
+
+
 
 #+lispworks
 (defun encoding-keyword (encoding-str)
