@@ -21,7 +21,7 @@
        ,@(mapcar (lambda (pair)
                    `(when (plusp (logand ,(first pair) ,value))
                       (push ',(second pair) ,pack)))
-                 (nreverse pairs))
+                 (reverse pairs))
        ,pack)))
 
 (defmacro pack-to-bitwise (packed &body pairs)
